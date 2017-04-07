@@ -276,7 +276,20 @@ module HelloSign
     end
 
     def prepare_signers(opts)
-      prepare opts, :signers
+      (opts[:signers] || []).each do |signer|
+        role = opts[:role]
+        if role
+          [:email_address, :name, :order].each do |attr_name|
+            if signer[attr_name]
+              opts["signers[#{role}][#{attr_name}]"] = signer[attr_name]
+            end
+          end
+        end
+      end
+
+      opts.delete(:role)
+      opts.delete(:signers)
+      opts
     end
 
     def prepare_ccs(opts)
